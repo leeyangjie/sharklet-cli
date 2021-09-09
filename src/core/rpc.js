@@ -2,6 +2,7 @@
 const assert = require('assert');
 const httpx = require('httpx');
 var   crypto    = require('crypto');
+var   xml2js    = require('xml2js');
 const JSON = require('json-bigint');
 const os = require('os');
 const errcode = require('./errcode.js');
@@ -29,8 +30,7 @@ function formatParams(params) {
 
 function timestamp() {
     var date = new Date();
-    return Intl.DateTimeFormat('en-us', {year: 'numeric', month: 'numeric', day: 'numeric',
-    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false, timeZoneName: 'short'}).format(date); 
+    return date.toUTCString();
 }
 
 function encode(str) {
@@ -96,8 +96,22 @@ function canonicalize(normalized) {
 
 
 function process_result(entry, buffer, need_request_id) {
+    var json, err;
     if (entry.response.statusCode != 200) {
-        var err = new Error(`Response status code: ${entry.response.statusCode} error, URL: ${entry.url}`);
+        xml2js.parseString(buffer, function (error, result) {
+            err = error;
+            json = result;
+        });
+        if (err != null) {
+            var err = new Error(`Response status code: ${entry.response.statusCode} error, Parse buffer error, URL: ${entry.url}`);
+            err.name = 'HTTP Response Status Error';
+            err.data = buffer;
+            err.code = errcode.http_status_error;
+            err.url = entry.url;
+            err.entry = entry;
+            return Promise.reject(err);
+        }
+        var err = new Error(`Response status code: ${entry.response.statusCode} ${json.response.code} error, Message: ${json.response.message}, URL: ${entry.url}`);
         err.name = 'HTTP Response Status Error';
         err.data = buffer;
         err.code = errcode.http_status_error;
@@ -105,8 +119,9 @@ function process_result(entry, buffer, need_request_id) {
         err.entry = entry;
         return Promise.reject(err);
     }
-    var json = JSON.parse(buffer);
-    if (!json) {
+    try {
+        json = JSON.parse(buffer);
+     } catch(e) {
         var err = new Error(`Response body JSON parse error, URL: ${entry.url}`);
         err.name = 'Response body JSON parse error';
         err.data = buffer;
@@ -114,7 +129,7 @@ function process_result(entry, buffer, need_request_id) {
         err.url = entry.url;
         err.entry = entry;
         return Promise.reject(err);
-    }
+     }
     if (!json.Code) {
         var err = new Error(`Response Code missing error, URL: ${entry.url}`);
         err.name = 'Response Code missing error';

@@ -27,13 +27,18 @@ async function DomainStagingConfig(sharkletjsCode) {
 	params['name'] = "sharklet.js";
     // requestOption.data = JSON.stringify(params_result);
     let result = await client.request('SetSharkLetStagingConfig', params, requestOption).catch(e => {
-        console.log("SetSharkLetStagingConfig -> e", e)
+        console.log(e.message)
     })
     if (result && result.Code && result.Code == errcode.continue) {
         GetAsnycResult(result.requestid, 'Staging environment configuration', '模拟环境配置' );
     } else if (result) {
-        console.log(chalk.greenBright(`[EN] Configuration succeeded in staging environment.`));
-        console.log(chalk.greenBright(`[CN] 模拟环境配置成功。`));
+        if (result.data && result.data.PreDeployIPS) {
+            console.log(chalk.greenBright(`[EN] Configuration succeeded in staging environment. staging server ip:${result.data.PreDeployIPS}`));
+            console.log(chalk.greenBright(`[CN] 模拟环境配置成功。预部署服务器IP地址：${result.data.PreDeployIPS}`));
+        } else {
+            console.log(chalk.greenBright(`[EN] Configuration succeeded in staging environment.`));
+            console.log(chalk.greenBright(`[CN] 模拟环境配置成功。`));
+        }
     }
 }
 
@@ -64,3 +69,4 @@ async function build(program) {
 module.exports = {
     build
 }
+

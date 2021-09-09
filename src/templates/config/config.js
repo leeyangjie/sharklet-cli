@@ -3,7 +3,7 @@ var config = {
     apiVersion: 'v0.1',
 
     // CDN OpenAPI Endpoint
-    endpoint: 'http://open-its.chinanetcenter.com/sharklet/',
+    endpoint: 'https://open.chinanetcenter.com/api/sharklet/',
 
     // Your CDN Domain
     domain: "",
@@ -21,9 +21,9 @@ var config = {
     check_interval: 5,
     read_timeout: 6000,
 
-    // Alicloud Config
-    accessKeyID: "", //Your aliYun account AccesskeyId
-    accessKeySecret: "", // Your aliYun account AccessKeySecret
+    // wangsu account Config
+    accessKeyID: "", //Your wangsu account AccessId
+    accessKeySecret: "", // Your wangsu account apiKey
     // The build sucess current timestamp
     buildTime: null,
 };

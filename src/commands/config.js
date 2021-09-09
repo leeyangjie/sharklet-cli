@@ -33,7 +33,7 @@ async function setConfigJS(configPath) {
             return true;
         }
     }, {
-        type: 'input',
+        type: 'password',
         name: 'set-config-access-secret',
         // message: 'set your accessSecret: ',
         message: chalk.greenBright('Enter your accessSecret (设置您的SK): '),

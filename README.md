@@ -8,7 +8,7 @@ The nodejs CLI tool of sharklet API.
 Install it and run your CLI commands.
 
 ```sh
-$ npm install sharklet-cli -g
+$ npm install @wangsu_serverless/sharklet-cli -g
 ```
 
 ## Prerequisite
@@ -17,7 +17,7 @@ Node.js >= 10.x
 
 ### Notes
 
-You must know your `AK`(`accessKeyId/accessKeySecret`), and the cloud product's `endpoint` and `apiVersion`.
+You must know your account, and the cloud product's `endpoint` and `apiVersion`.
 
 ## Usage
 
@@ -63,11 +63,11 @@ $ sharklet-cli build
 
 ### 5. Test your code now, you can also show your codes and related config.
 ```sh
-$ curl -v 'http://yourdomain.com/yourpath/' -x 42.123.119.50:80
+$ curl -v 'http://yourdomain.com/yourpath/' -x 59.61.78.233:80
 ```
 
 ```sh
-$ curl --resolve yourdomain.com:443:42.123.119.50 'https://yourdomain.com/yourpath/' -v
+$ curl --resolve yourdomain.com:443:59.61.78.233 'https://yourdomain.com/yourpath/' -v
 ```
 
 ```sh

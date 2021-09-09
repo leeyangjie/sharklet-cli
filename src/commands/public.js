@@ -117,7 +117,7 @@ function DeleteConfigs(env) {
                     console.log(chalk.redBright(`[EN] You can not modify the configurations of production environment when the staging environment is not empty. Please rollback staging environment first.`));
                     console.log(chalk.redBright(`[CN] 当模拟环境有配置时不能直接修改生产环境的配置，您需要先回滚模拟环境。`));
                 } else {
-                    console.log("DeleteConfigs -> e", e);
+                    console.log(e.message);
                 }
             });
             if (result && result.Code && result.Code == errcode.continue) {
@@ -135,6 +135,7 @@ function DeleteConfigs(env) {
     })
 }
 
+var PreDeployIPS = null;
 
 // 
 function GetAsnycResult(requestid, EN, CN) {
@@ -162,8 +163,14 @@ function GetAsnycResult(requestid, EN, CN) {
     });
     subprocess.on('close', async (value) => {
         if (value > 0) {
-            console.log(chalk.greenBright(`[EN] ${EN} successed.`));
-            console.log(chalk.greenBright(`[CN] ${CN}成功.`));
+            if (PreDeployIPS != null) {
+                console.log(chalk.greenBright(`[EN] ${EN} successed. Staging server ip address:${PreDeployIPS}.`));
+                console.log(chalk.greenBright(`[CN] ${CN}成功. 预部署服务器IP地址：${PreDeployIPS}.`));
+            } else {
+                console.log(chalk.greenBright(`[EN] ${EN} successed.`));
+                console.log(chalk.greenBright(`[CN] ${CN}成功.`));
+            }
+
         } else {
             console.log(chalk.greenBright(`[EN] ${EN} failed, ${AsyncError.code}: ${AsyncError.name} ${AsyncError.message}`));
             console.log(chalk.greenBright(`[CN] ${CN}失败, ${AsyncError.code}:  ${AsyncError.name} ${AsyncError.message}.`));
@@ -225,6 +232,9 @@ async function GetResultFlag(requestid) {
         if (Reflect.has(result, "Code")) {
             if (parseInt(result.Code) == errcode.success) {
                 flag = 1;
+                if (result.data && result.data.PreDeployIPS) {
+                    PreDeployIPS = result.data.PreDeployIPS;
+                }
             } else if (parseInt(result.Code) == errcode.continue) {
                 flag = 0;
             } else {
@@ -249,3 +259,4 @@ module.exports = {
     DeleteConfigs,
     GetAsnycResult
 }
+
